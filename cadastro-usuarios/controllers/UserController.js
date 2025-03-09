@@ -1,8 +1,40 @@
 const UserModel = require("../models/UserModel");
 const UserValidation = require("../utils/UserValidation");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const dotenv = require("dotenv");
 const validationUser = require("../utils/validationFieldsUser");
 
+
+dotenv.config();
+
 class UserController {
+    async login(req, res) {
+        const { email, password } = req.body;
+
+        const user = await UserModel.getUserByEmail(email);
+
+        if (user.length == 0) {
+            res.status(400).json({ error: "E-mail ou senha inválidos." })
+            return;
+        }
+
+        const passwordMatch = bcrypt.compare(password, user[0].password);
+
+        if (!passwordMatch) {
+            res.status(400).json({ error: "E-mail ou senha inválidos." });
+            return;
+        }
+
+        const token = jwt.sign(
+            { id: user[0].id, name: user[0].name, email: user[0].email },
+            process.env.JWT_SECRET,
+            { expiresIn: Math.floor(Date.now() / 1000) + (60 * 60) }
+        );
+
+        res.json({ message: "Login realizado com sucesso.", token });
+    }
+
     async list(req, res) {
         const users = await UserModel.getAllUsers();
         res.json(users);

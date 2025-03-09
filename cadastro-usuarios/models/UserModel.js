@@ -1,4 +1,5 @@
 const database = require("../database/connection");
+const bcrypt = require("bcrypt");
 
 class UserModel {
     async getAllUsers() {
@@ -9,8 +10,13 @@ class UserModel {
         return await database.query("SELECT * FROM usuarios WHERE id = $1", [id]);
     }
 
+    async getUserByEmail(email) {
+        return await database.query("SELECT * FROM usuarios WHERE email = $1", [email]);
+    }
+
     async createUser(name, email, password) {
-        return await database.query("INSERT INTO usuarios (name, email, password) VALUES ($1, $2, $3) RETURNING *", [name, email, password]);
+        const hashedPassword = await bcrypt.hash(password, 10);
+        return await database.query("INSERT INTO usuarios (name, email, password) VALUES ($1, $2, $3) RETURNING *", [name, email, hashedPassword]);
     }
 
     async updateUser(id, name, email, password) {
