@@ -1,12 +1,8 @@
 const UserModel = require("../models/UserModel");
-const UserValidation = require("../utils/UserValidation");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const dotenv = require("dotenv");
 const validationUser = require("../utils/validationFieldsUser");
 
-
-dotenv.config();
 
 class UserController {
     async login(req, res) {

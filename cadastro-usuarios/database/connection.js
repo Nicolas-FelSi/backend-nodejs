@@ -1,7 +1,4 @@
-const dotenv = require("dotenv");
 const { Client } = require("pg");
-
-dotenv.config();
 
 class Database {
     constructor() {
